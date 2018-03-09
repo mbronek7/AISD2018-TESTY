@@ -2,33 +2,33 @@
 
 pretty()
 {
-	if command -v 'tput' &>/dev/null && [ -t 1 ]
-	then
-		tput "$@"
-	fi
+    if command -v 'tput' &>/dev/null && [ -t 1 ]
+    then
+        tput "$@"
+    fi
 }
 
 failed()
 {
-	pretty bold
-	pretty setaf 1
-	printf "$@"
-	pretty sgr0
+    pretty bold
+    pretty setaf 1
+    printf "$@"
+    pretty sgr0
 }
 
 ok()
 {
-	pretty bold
-	pretty setaf 2
-	printf "$@"
-	pretty sgr0
+    pretty bold
+    pretty setaf 2
+    printf "$@"
+    pretty sgr0
 }
 
 strong()
 {
-	pretty bold
-	printf "$@"
-	pretty sgr0
+    pretty bold
+    printf "$@"
+    pretty sgr0
 }
 
 all()
