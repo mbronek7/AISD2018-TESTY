@@ -1,13 +1,17 @@
+PROGRAM = program
 
-Flags = -std=gnu++14 -Wall -Wextra -Wshadow -O2 -static
-CPP = g++
+CPPFLAGS = -std=gnu++14 -Wall -Wextra -Wshadow -O2 -static -DSPRAWDZACZKA
+CXX = g++
 
+$(PROGRAM): main.cpp
+	@echo "CC $<"
+	@$(CXX) $(CPPFLAGS) -o $@ $<
 
-main : Makefile   main.o 
-	$(CPP) $(Flags) -o main   main.o 
+.PHONY: test
+test: $(PROGRAM)
+	@tests/test.sh -e -p program $(wildcard tests/*.in)
 
-main.o : Makefile   main.cpp   
-	$(CPP) -c $(Flags) main.cpp -o  main.o
+.PHONY: clean
+clean:
+	rm -rf *.o $(PROGRAM)
 
-clean :
-	rm -f main main.o 
