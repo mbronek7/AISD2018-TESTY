@@ -9,7 +9,7 @@ $(PROGRAM): main.cpp
 
 .PHONY: test
 test: $(PROGRAM)
-	@tests/test.sh -e -p program $(wildcard tests/*.in)
+	@./check $(PROGRAM) $(shell find -L tests -iname '*.in')
 
 .PHONY: clean
 clean:
