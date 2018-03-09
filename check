@@ -1,5 +1,35 @@
 #!/usr/bin/env sh
 
+pretty()
+{
+	if command -v 'tput' &>/dev/null && [ -t 1 ]
+	then
+		tput "$@"
+	fi
+}
+
+failed()
+{
+	pretty bold
+	pretty setaf 1
+	printf "$@"
+	pretty sgr0
+}
+
+ok()
+{
+	pretty bold
+	pretty setaf 2
+	printf "$@"
+	pretty sgr0
+}
+
+strong()
+{
+	pretty bold
+	printf "$@"
+	pretty sgr0
+}
 
 all()
 {
@@ -20,13 +50,16 @@ all()
 
             if [ $? -eq 0 ]
             then
-                echo "✓ Program passed $testcase"
+                ok " ✓ "
+                printf "$testcase\n"
                 passed=$((passed + 1))
             else
-                echo "⨯ Wrong answer for $testcase"
+                failed " ⨯ "
+                printf "Wrong answer for $testcase\n"
             fi
         else
-            echo "⨯ Non-zero status code in $testcase (memory limit exceeded?)"
+            failed " ⨯ "
+            printf "Memory limit exceeded (?) for $testcase\n"
         fi
     done
 
