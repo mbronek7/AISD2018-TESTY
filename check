@@ -1,0 +1,99 @@
+#!/usr/bin/env sh
+
+
+all()
+{
+    program="$1"
+    memory="$2"
+    shift 2
+
+    passed=0
+    total=$#
+
+    for testcase in "$@"
+    do
+        result=$(execute "$program" "$memory" "$testcase")
+
+        if [ $? -eq 0 ]
+        then
+            printf "$result" | diff -b -B - "${testcase%.in}.out" >/dev/null
+
+            if [ $? -eq 0 ]
+            then
+                echo "✓ Program passed $testcase"
+                passed=$((passed + 1))
+            else
+                echo "⨯ Wrong answer for $testcase"
+            fi
+        else
+            echo "⨯ Non-zero status code in $testcase (memory limit exceeded?)"
+        fi
+    done
+
+    echo
+    echo " ======================================"
+    echo " Passed $passed"
+    echo " Failed $((total - passed))"
+    echo " ======================================"
+}
+
+execute()
+{
+    program="$1"
+    memory="$2"
+    testcase="$3"
+
+    (
+        ulimit -v "$memory"
+        "$PWD"/"${program}" < "${testcase}"
+    )
+}
+
+die()
+{
+    echo "$@"
+    exit 1
+}
+
+usage()
+{
+    die "test-run [-m MEMORY] [-e] PROGRAM TEST [TEST...]"
+}
+
+main()
+{
+    while getopts "m:eh" opt
+    do
+        case "${opt}" in
+            "e") echo 'parsing e'; ;;
+            "h") echo 'parsing h'; ;;
+			"m") memory="${OPTARG}" ;;
+              *) echo 'undefined option' ;;
+        esac
+    done
+    shift $((OPTIND-1))
+
+    if [ $# -lt 1 ]
+    then
+        usage
+    fi
+
+    program="$1"
+    shift 1
+
+    if [ ! -e "${program}" ]
+    then
+        die "Error: ${program} doesn't exist or isn't executable"
+    fi
+
+    if [ $# -lt 1 ]
+    then
+        all "$program" "${memory:-unlimited}" tests/*.in
+    else
+        all "$program" "${memory:-unlimited}" "$@"
+    fi
+}
+
+main "$@"
+
+# vim: set ts=4 sw=4 et:
