@@ -1,6 +1,6 @@
 PROGRAM = program
 
-CPPFLAGS = -std=gnu++14 -Wall -Wextra -Wshadow -O2 -static -DSPRAWDZACZKA
+CPPFLAGS = -std=gnu++14 -Wall -Wextra -Wshadow -O2 -static
 CXX = g++
 
 $(PROGRAM): main.cpp
