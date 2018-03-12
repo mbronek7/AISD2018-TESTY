@@ -55,11 +55,11 @@ all()
                 passed=$((passed + 1))
             else
                 failed " ⨯ "
-                printf "Wrong answer for $testcase\n"
+                printf "$testcase Wrong answer \n"
             fi
         else
             failed " ⨯ "
-            printf "Memory limit exceeded (?) for $testcase\n"
+            printf "$testcase Memory limit exceeded\n"
         fi
     done
 
