@@ -85,7 +85,7 @@ execute()
     testcase="$3"
 
     (
-        ulimit -v "$memory"
+        ulimit -s unlimited -v "$memory"
         "$PWD"/"${program}" < "${testcase}"
     )
 }
