@@ -1,7 +1,12 @@
 PROGRAM = program
+MEMORY_LIMIT = unlimited
 
-CPPFLAGS = -std=gnu++14 -Wall -Wextra -Wshadow -O2 -static -DSPRAWDZACZKA
+CPPFLAGS = -std=gnu++14 -Wall -Wextra -Wshadow -O2 -static
 CXX = g++
+
+ifneq ("$(wildcard tests/memory_limit)","")
+	MEMORY_LIMIT = $(shell cat tests/memory_limit)
+endif
 
 $(PROGRAM): main.cpp
 	@echo "CC $<"
@@ -9,7 +14,7 @@ $(PROGRAM): main.cpp
 
 .PHONY: test
 test: $(PROGRAM)
-	@./check $(PROGRAM) $(shell find -L tests -iname '*.in')
+	@./check -m $(MEMORY_LIMIT) $(PROGRAM) $(shell find -L tests -iname '*.in')
 
 .PHONY: clean
 clean:

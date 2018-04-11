@@ -2,33 +2,41 @@
 
 pretty()
 {
-    if command -v 'tput' &>/dev/null && [ -t 1 ]
+    if command -v 'tput' &>/dev/null
     then
-        tput "$@"
+        tput $*
     fi
 }
 
+BOLD=$(pretty bold)
+RESET=$(pretty sgr0)
+FAILED=$(pretty setaf 1)
+OK=$(pretty setaf 2)
+
 failed()
 {
-    pretty bold
-    pretty setaf 1
-    printf "$@"
-    pretty sgr0
+    if [ -t 1 ]
+    then
+        printf "$BOLD"
+        printf "$FAILED"
+        printf "$@"
+        printf "$RESET"
+    else
+        printf "$@"
+    fi
 }
 
 ok()
 {
-    pretty bold
-    pretty setaf 2
-    printf "$@"
-    pretty sgr0
-}
-
-strong()
-{
-    pretty bold
-    printf "$@"
-    pretty sgr0
+    if [ -t 1 ]
+    then
+        printf "$BOLD"
+        printf "$OK"
+        printf "$@"
+        printf "$RESET"
+    else
+        printf "$@"
+    fi
 }
 
 all()
@@ -55,11 +63,11 @@ all()
                 passed=$((passed + 1))
             else
                 failed " ⨯ "
-                printf "Wrong answer for $testcase\n"
+                printf "$testcase Wrong answer \n"
             fi
         else
             failed " ⨯ "
-            printf "Memory limit exceeded (?) for $testcase\n"
+            printf "$testcase Memory limit exceeded\n"
         fi
     done
 
@@ -77,7 +85,7 @@ execute()
     testcase="$3"
 
     (
-        ulimit -v "$memory"
+        ulimit -s unlimited -v "$memory"
         "$PWD"/"${program}" < "${testcase}"
     )
 }
