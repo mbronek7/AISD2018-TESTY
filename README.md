@@ -1,3 +1,6 @@
+**Update** 16.04.18  
+Od teraz `make test` powinien poprawnie wypisywać wyniki testów na Debiano-pochodnych dystrybucjach linuxa.
+
 ## Jak dodać nowe testy?
 Każdy test składa się z pliku wejściowego `test-name.in` oraz 
 wyjściowego `test-name.out` zawierający poprawne odpowiedzi.
