@@ -13,6 +13,18 @@ RESET=$(pretty sgr0)
 FAILED=$(pretty setaf 1)
 OK=$(pretty setaf 2)
 
+bold()
+{
+    if [ -t 1 ]
+    then
+        printf "$BOLD"
+        printf "$@"
+        printf "$RESET"
+    else
+        printf "$@"
+    fi
+}
+
 failed()
 {
     if [ -t 1 ]
@@ -50,6 +62,7 @@ all()
 
     for testcase in "$@"
     do
+        printf " ${testcase#tests/}"
         result=$(execute "$program" "$memory" "$testcase")
 
         if [ $? -eq 0 ]
@@ -58,24 +71,22 @@ all()
 
             if [ $? -eq 0 ]
             then
-                ok " ✓ "
-                printf "$testcase\n"
+                ok " Passed\n"
                 passed=$((passed + 1))
             else
-                failed " ⨯ "
-                printf "$testcase Wrong answer \n"
+                failed " Wrong Answer\n"
             fi
         else
-            failed " ⨯ "
-            printf "$testcase Memory limit exceeded\n"
+            bold " Memory limit exceeded\n"
         fi
     done
 
     echo
     echo " ======================================"
-    echo " Passed $passed"
-    echo " Failed $((total - passed))"
+    echo "  Passed $passed"
+    echo "  Failed $((total - passed))"
     echo " ======================================"
+    echo
 }
 
 execute()
@@ -90,7 +101,7 @@ execute()
             ulimit -v "$memory"
             "$PWD"/"${program}" < "${testcase}"
         )
-    )
+    ) 2>/dev/null
 }
 
 die()
@@ -101,7 +112,7 @@ die()
 
 usage()
 {
-    die "test-run [-m MEMORY] [-e] PROGRAM TEST [TEST...]"
+    die "check [-m MEMORY] [-e] PROGRAM TEST [TEST...]"
 }
 
 main()
@@ -109,10 +120,9 @@ main()
     while getopts "m:eh" opt
     do
         case "${opt}" in
-            "e") echo 'parsing e'; ;;
-            "h") echo 'parsing h'; ;;
-			"m") memory="${OPTARG}" ;;
-              *) echo 'undefined option' ;;
+            "h") usage ;;
+            "m") memory="${OPTARG}" ;;
+            *) die "Option ${OPTARG} not implemented or undefined" ;;
         esac
     done
     shift $((OPTIND-1))
