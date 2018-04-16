@@ -11,6 +11,7 @@ pretty()
 BOLD=$(pretty bold)
 RESET=$(pretty sgr0)
 FAILED=$(pretty setaf 1)
+ERROR=$(pretty setaf 4)
 OK=$(pretty setaf 2)
 
 bold()
@@ -18,6 +19,19 @@ bold()
     if [ -t 1 ]
     then
         printf "$BOLD"
+        printf "$@"
+        printf "$RESET"
+    else
+        printf "$@"
+    fi
+}
+
+error()
+{
+    if [ -t 1 ]
+    then
+        printf "$BOLD"
+        printf "$ERROR"
         printf "$@"
         printf "$RESET"
     else
@@ -63,7 +77,7 @@ all()
     for testcase in "$@"
     do
         printf " ${testcase#tests/}"
-        result=$(execute "$program" "$memory" "$testcase")
+        result=$(execute "$program" "$memory" "$testcase" 2>/dev/null)
 
         if [ $? -eq 0 ]
         then
@@ -77,7 +91,7 @@ all()
                 failed " Wrong Answer\n"
             fi
         else
-            bold " Memory limit exceeded\n"
+            error " Runtime error / Memory limit exceeded\n"
         fi
     done
 
@@ -101,7 +115,7 @@ execute()
             ulimit -v "$memory"
             "$PWD"/"${program}" < "${testcase}"
         )
-    ) 2>/dev/null
+    )
 }
 
 die()
