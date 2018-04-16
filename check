@@ -2,9 +2,9 @@
 
 pretty()
 {
-    if command -v 'tput' &>/dev/null
+    if command -v 'tput' 2>&1 1>/dev/null
     then
-        tput $*
+        tput "$@"
     fi
 }
 
