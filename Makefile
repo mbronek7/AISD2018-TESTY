@@ -21,7 +21,7 @@ $(PROGRAM): $(SOURCE)
 
 .PHONY: test
 test: $(PROGRAM)
-	@./check -m $(MEMORY_LIMIT) $(PROGRAM) $(shell find -L tests -iname '*.in')
+	@./check -m $(MEMORY_LIMIT) $(PROGRAM)
 
 .PHONY: clean
 clean:

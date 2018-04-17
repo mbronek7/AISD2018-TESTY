@@ -126,7 +126,7 @@ die()
 
 usage()
 {
-    die "check [-m MEMORY] [-e] PROGRAM TEST [TEST...]"
+    die "check [-m MEMORY] PROGRAM [TEST, ...]"
 }
 
 main()
@@ -156,7 +156,7 @@ main()
 
     if [ $# -lt 1 ]
     then
-        all "$program" "${memory:-unlimited}" tests/*.in
+        all "$program" "${memory:-unlimited}" tests/*/*.in
     else
         all "$program" "${memory:-unlimited}" "$@"
     fi
