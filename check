@@ -2,16 +2,42 @@
 
 pretty()
 {
-    if command -v 'tput' &>/dev/null
+    if command -v 'tput' 1>/dev/null 2>&1
     then
-        tput $*
+        tput "$@"
     fi
 }
 
 BOLD=$(pretty bold)
 RESET=$(pretty sgr0)
 FAILED=$(pretty setaf 1)
+ERROR=$(pretty setaf 4)
 OK=$(pretty setaf 2)
+
+bold()
+{
+    if [ -t 1 ]
+    then
+        printf "$BOLD"
+        printf "$@"
+        printf "$RESET"
+    else
+        printf "$@"
+    fi
+}
+
+error()
+{
+    if [ -t 1 ]
+    then
+        printf "$BOLD"
+        printf "$ERROR"
+        printf "$@"
+        printf "$RESET"
+    else
+        printf "$@"
+    fi
+}
 
 failed()
 {
@@ -50,7 +76,8 @@ all()
 
     for testcase in "$@"
     do
-        result=$(execute "$program" "$memory" "$testcase")
+        printf " * ${testcase%.in}"
+        result=$(execute "$program" "$memory" "$testcase" 2>/dev/null)
 
         if [ $? -eq 0 ]
         then
@@ -58,24 +85,22 @@ all()
 
             if [ $? -eq 0 ]
             then
-                ok " ✓ "
-                printf "$testcase\n"
+                ok " Passed\n"
                 passed=$((passed + 1))
             else
-                failed " ⨯ "
-                printf "$testcase Wrong answer \n"
+                failed " Wrong Answer\n"
             fi
         else
-            failed " ⨯ "
-            printf "$testcase Memory limit exceeded\n"
+            error " Runtime error / Memory limit exceeded\n"
         fi
     done
 
     echo
     echo " ======================================"
-    echo " Passed $passed"
-    echo " Failed $((total - passed))"
+    echo "  Passed $passed"
+    echo "  Failed $((total - passed))"
     echo " ======================================"
+    echo
 }
 
 execute()
@@ -85,8 +110,11 @@ execute()
     testcase="$3"
 
     (
-        ulimit -s unlimited -v "$memory"
-        "$PWD"/"${program}" < "${testcase}"
+        ulimit -s unlimited
+        (
+            ulimit -v "$memory"
+            "$PWD"/"${program}" < "${testcase}"
+        )
     )
 }
 
@@ -98,7 +126,7 @@ die()
 
 usage()
 {
-    die "test-run [-m MEMORY] [-e] PROGRAM TEST [TEST...]"
+    die "check [-m MEMORY] PROGRAM [TEST, ...]"
 }
 
 main()
@@ -106,10 +134,9 @@ main()
     while getopts "m:eh" opt
     do
         case "${opt}" in
-            "e") echo 'parsing e'; ;;
-            "h") echo 'parsing h'; ;;
-			"m") memory="${OPTARG}" ;;
-              *) echo 'undefined option' ;;
+            "h") usage ;;
+            "m") memory="${OPTARG}" ;;
+            *) die "Option ${OPTARG} not implemented or undefined" ;;
         esac
     done
     shift $((OPTIND-1))
@@ -129,7 +156,7 @@ main()
 
     if [ $# -lt 1 ]
     then
-        all "$program" "${memory:-unlimited}" tests/*.in
+        all "$program" "${memory:-unlimited}" tests/*/*.in
     else
         all "$program" "${memory:-unlimited}" "$@"
     fi

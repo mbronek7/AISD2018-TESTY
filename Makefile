@@ -1,20 +1,27 @@
+SOURCE = $(wildcard main.*)
 PROGRAM = program
 MEMORY_LIMIT = unlimited
 
-CPPFLAGS = -std=gnu++14 -Wall -Wextra -Wshadow -O2 -static
-CXX = g++
+CXXFLAGS = -Wall -Wextra -Wshadow -O2 -static
+
+ifeq ("$(suffix $(SOURCE))",".cpp")
+	CXXFLAGS += -std=gnu++14
+	CXX = g++
+else ifeq ("$(suffix $(SOURCE))",".c")
+	CXXFLAGS += -std=gnu99 -lm
+	CXX = gcc
+endif
 
 ifneq ("$(wildcard tests/memory_limit)","")
 	MEMORY_LIMIT = $(shell cat tests/memory_limit)
 endif
 
-$(PROGRAM): main.cpp
-	@echo "CC $<"
-	@$(CXX) $(CPPFLAGS) -o $@ $<
+$(PROGRAM): $(SOURCE)
+	$(CXX) $(CXXFLAGS) -o $@ $<
 
 .PHONY: test
 test: $(PROGRAM)
-	@./check -m $(MEMORY_LIMIT) $(PROGRAM) $(shell find -L tests -iname '*.in')
+	@./check -m $(MEMORY_LIMIT) $(PROGRAM)
 
 .PHONY: clean
 clean:

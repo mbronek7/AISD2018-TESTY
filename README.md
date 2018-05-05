@@ -1,3 +1,7 @@
+**Update** 16.04.18  
+Od teraz `make test` powinien poprawnie wypisywać wyniki testów na Debiano-pochodnych dystrybucjach linuxa.  
+Od teraz Makefile używa kompilatora C dla pliku `main.c`.
+
 ## Jak dodać nowe testy?
 Każdy test składa się z pliku wejściowego `test-name.in` oraz 
 wyjściowego `test-name.out` zawierający poprawne odpowiedzi.
@@ -17,8 +21,7 @@ ln -s A tests
 ```
 
 Następnie użyj make, który zakłada, że nazwa pliku z kodem programu to
-`main.cpp`  
-_(można zmienic w pliku Makefile, zmienna PROGRAM)._
+`main.cpp` lub `main.c`  
 
 ```
 # Kompiluje main.cpp jako 'program'
